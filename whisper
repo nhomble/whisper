@@ -96,7 +96,6 @@ while getopts ":m::s:pl:" option; do
     p)
       # password protected
       read_password
-      echo $password
       ;;
     l)
       # lifespan
