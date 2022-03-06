@@ -1,5 +1,4 @@
 #!/usr/bin/env sh
-set -x
 
 readonly GOSECRET="https://www.gosecret.io"
 
@@ -44,9 +43,11 @@ create_secret() {
 view_secret() {
   id="$1"
   [ ! -z "$2" ] && password="$2" || password=""
-  [ ! -z "$password" ] && json=$(jq --null-input --arg pass "$password" '{"password": $pass}') || json="{}"
+  [ ! -z "$password" ] \
+    && json=$(jq --null-input --arg pass "$password" '{"data": {"type": "payloads", "attributes": {"password": $pass}}}') \
+    || json=$(jq --null-input '{"data": {"type": "payloads", "attributes": {}}}')
 
-  curl -s --location --request POST "$GOSECRET/api/${id}" \
+  curl -s --location -g --request POST "$GOSECRET/api/${id}" \
     --header 'Content-Type: application/json' \
     --data-raw "${json}"
   unset id
@@ -88,13 +89,13 @@ while getopts ":m::s:pl:" option; do
       # the message, if empty, take from stdin
       [ "$MODE" = "view" ] && usage && exit 1
       MODE="message"
-      [ ! -z "${OPTARG}" ] && message="${OPTARG}" || message=$(cat -)
+      message="${OPTARG}"
       ;;
     s)
       # the secret, if empty, take from stdin
       [ "$MODE" = "message" ] && usage && exit 1
       MODE="view"
-      [ ! -z "${OPTARG}" ] && id="${OPTARG}" || id=$(cat -)
+      id="${OPTARG}"
       ;;
     p)
       # password protected
