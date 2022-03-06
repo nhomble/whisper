@@ -27,7 +27,7 @@ create_secret() {
       }
     }' \
   )
-  curl -s --location -X POST "$GOSECRET/api/create" \
+  curl -s -L -X POST "$GOSECRET/api/create" \
     --header 'Content-Type: application/json' \
     --data-raw "${json}" \
     | jq '.message'
@@ -48,7 +48,7 @@ view_secret() {
     && json=$(jq --null-input --arg pass "$password" '{"data": {"type": "payloads", "attributes": {"password": $pass}}}') \
     || json=$(jq --null-input '{"data": {"type": "payloads", "attributes": {}}}')
 
-  curl  --location -g -X POST "$GOSECRET/api${id}" \
+  curl  -L -g -X POST "$GOSECRET/api${id}" \
     --header 'Content-Type: application/json' \
     --data-raw "${json}"
   unset id
