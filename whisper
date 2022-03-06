@@ -24,7 +24,8 @@ create_secret() {
   curl -s -L -X POST "$GOSECRET/api/create" \
     --header 'Content-Type: application/json' \
     --data-raw "${json}" \
-    | jq '.message'
+    | jq '.message' \
+    | sed 's/^"\/secrets\//"/g'
 
   # fetep please teach
   unset message
@@ -42,7 +43,7 @@ view_secret() {
     && json=$(jq --null-input --arg pass "$password" '{"password": $pass}') \
     || json=$(jq --null-input '{}')
 
-  curl -s -L -g -X POST "$GOSECRET/api${id}" \
+  curl -s -L -g -X POST "$GOSECRET/api/secrets/${id}" \
     --header 'Content-Type: application/json' \
     --data-raw "${json}" \
     | jq ' .message '
@@ -67,7 +68,7 @@ usage() {
 whisper - exchange secrets in the shell, powered by gosecret.io
 
 whisper -m "a secret"
-whisper -s "/secrets/123131231"
+whisper -s "06fc3b7879d94509ac84a2413621a438"
 
 -m [MESSAGE]
       the message you want to send in secret, will use stdin if this is empty

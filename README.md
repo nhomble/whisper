@@ -3,9 +3,9 @@
 ## Usage
 ```sh
 $ ./whisper -m 'hey there!'
-"/secrets/757837ce23e2455bbd698d4f23775687"
+"757837ce23e2455bbd698d4f23775687"
 
-$ ./whisper -s "/secrets/757837ce23e2455bbd698d4f23775687"
+$ ./whisper -s "757837ce23e2455bbd698d4f23775687"
 "hey there!"
 ```
 
