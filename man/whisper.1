@@ -48,6 +48,20 @@ This parameter sets the lifespan of the secret via the \fB-m\fR command. The
 duration is in ISO-8601.
 .P
 .RE
+.SS ENVIRONMENT VARIABLES
+.P
+\fBWHISPER_GOSECRET\fR
+.RS 4
+Defaulted to https://www.gosecret.io, you can set this environment variable
+to instruct the cli to point to a different instance.
+.P
+.RE
+\fBWHISPER_PASSWORD\fR
+.RS 4
+Defaulted to nothing, you can set this environment variable to avoid the
+password prompt when using the \fB-p\fR flag.
+.P
+.RE
 .SH EXAMPLES
 .P
 Create a secret message

@@ -33,6 +33,16 @@ generate secret messages in your terminal to send to others.
 	This parameter sets the lifespan of the secret via the *-m* command. The 
 	duration is in ISO-8601.
 
+## ENVIRONMENT VARIABLES
+
+*WHISPER_GOSECRET*
+	Defaulted to https://www.gosecret.io, you can set this environment variable
+	to instruct the cli to point to a different instance.
+
+*WHISPER_PASSWORD*
+	Defaulted to nothing, you can set this environment variable to avoid the
+	password prompt when using the *-p* flag.
+
 # EXAMPLES
 
 Create a secret message

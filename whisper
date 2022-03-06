@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-readonly GOSECRET="https://www.gosecret.io"
+: ${WHISPER_GOSECRET:=https://www.gosecret.io}
 
 # creates a new secret
 # $1 - message
@@ -21,7 +21,7 @@ create_secret() {
       "lifespan": $life
     }' \
   )
-  curl -s -L -X POST "$GOSECRET/api/create" \
+  curl -s -L -X POST "$WHISPER_GOSECRET/api/create" \
     --header 'Content-Type: application/json' \
     --data-raw "${json}" \
     | jq '.message' \
@@ -43,7 +43,7 @@ view_secret() {
     && json=$(jq --null-input --arg pass "$password" '{"password": $pass}') \
     || json=$(jq --null-input '{}')
 
-  curl -s -L -g -X POST "$GOSECRET/api/secrets/${id}" \
+  curl -s -L -g -X POST "$WHISPER_GOSECRET/api/secrets/${id}" \
     --header 'Content-Type: application/json' \
     --data-raw "${json}" \
     | jq ' .message '
