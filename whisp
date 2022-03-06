@@ -1,0 +1,112 @@
+#!/usr/bin/env sh
+set -x
+
+readonly GOSECRET="https://www.gosecret.io"
+
+# creates a new secret
+# $1 - message
+# $2 - password
+# returns the message id
+create_secret() {
+  message="$1"
+  [ ! -z "$2" ] && password="$2" || password=""
+  [ ! -z "$3" ] && lifespan="$3" || lifespan="5m"
+  json=$(jq --null-input \
+    --arg msg "$message" \
+    --arg pass "$password" \
+    --arg life "$lifespan" \
+    '
+    {
+      "data": {
+        "type": "payloads",
+        "attributes": {
+          "message": $msg,
+          "password": $pass,
+          "lifespan": $life
+        }
+      }
+    }' \
+  )
+  curl -s --location --request POST "$GOSECRET/api/create" \
+    --header 'Content-Type: application/json' \
+    --data-raw "${json}" \
+    | jq '.message'
+
+  # fetep please teach
+  unset message
+  unset password
+  unset json
+  unset lifespan
+}
+
+# view a secret
+
+view_secret() {
+  id="$1"
+  [ ! -z "$2" ] && password="$2" || password=""
+  [ ! -z "$password" ] && json=$(jq --null-input --arg pass "$password" '{"password": $pass}') || json="{}"
+
+  curl -s --location --request POST "$GOSECRET/api/${id}" \
+    --header 'Content-Type: application/json' \
+    --data-raw "${json}"
+  unset id
+  unset password
+  unset json
+}
+
+read_password(){
+  stty -echo
+  printf "password: "
+  read password
+  stty echo
+  printf "\n"
+}
+
+usage() {
+  cat <<EOF
+whisper - exchange secrets in the shell, powered by gosecret.io
+
+whisp -m "a secret"
+whisp -s "/secrets/123131231"
+
+-m [MESSAGE]
+      the message you want to send in secret, will use stdin if this is empty
+-s [SECRET ID]
+      the secret id you want to read, will use stdin if this is empty
+-p
+      add a password to the create or read function, this is interactive
+-l [LIFESPAN]
+      specify a lifespan when you create a password ISO-8601, will default to '5m'
+
+EOF
+}
+
+MODE=""
+while getopts ":m::s:pl:" option; do
+  case ${option} in
+    m)
+      # the message, if empty, take from stdin
+      [ "$MODE" = "view" ] && usage && exit 1
+      MODE="message"
+      [ ! -z "${OPTARG}" ] && message="${OPTARG}" || message=$(cat -)
+      ;;
+    s)
+      # the secret, if empty, take from stdin
+      [ "$MODE" = "message" ] && usage && exit 1
+      MODE="view"
+      [ ! -z "${OPTARG}" ] && id="${OPTARG}" || id=$(cat -)
+      ;;
+    p)
+      # password protected
+      read_password
+      echo $password
+      ;;
+    l)
+      # lifespan
+      lifespan=${OPTARG}
+      ;;
+  esac
+done
+[ -z "$MODE" ] && usage && exit 1
+[ "$MODE" = "view" ] && view_secret "$id" "$password"
+[ "$MODE" = "message" ] && create_secret "$message" "$password" "$lifespan"
