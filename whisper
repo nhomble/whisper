@@ -52,26 +52,30 @@ view_secret() {
 }
 
 read_password(){
-  stty -echo
-  printf "password: "
-  read password
-  stty echo
-  printf "\n"
+  password="$WHISPER_PASSWORD"
+  if [ -z "$WHISPER_PASSWORD" ]; then
+    stty -echo
+    printf "password: "
+    read password
+    stty echo
+    printf "\n"
+  fi
 }
 
 usage() {
   cat <<EOF
 whisper - exchange secrets in the shell, powered by gosecret.io
 
-whisp -m "a secret"
-whisp -s "/secrets/123131231"
+whisper -m "a secret"
+whisper -s "/secrets/123131231"
 
 -m [MESSAGE]
       the message you want to send in secret, will use stdin if this is empty
 -s [SECRET ID]
       the secret id you want to read, will use stdin if this is empty
 -p
-      add a password to the create or read function, this is interactive
+      add a password to the create or read function, by default this is interactive
+      if WHISPER_PASSWORD is available in the environment, then it takes precedence
 -l [LIFESPAN]
       specify a lifespan when you create a password ISO-8601, will default to '5m'
 
