@@ -1,5 +1,4 @@
 #!/usr/bin/env sh
-set -x
 
 readonly GOSECRET="https://www.gosecret.io"
 
@@ -40,12 +39,13 @@ view_secret() {
   id="$1"
   [ ! -z "$2" ] && password="$2" || password=""
   [ ! -z "$password" ] \
-    && json=$(jq --null-input --arg pass "$password" '{"data": {"type": "payloads", "attributes": {"password": $pass}}}') \
-    || json=$(jq --null-input '{"data": {"type": "payloads", "attributes": {}}}')
+    && json=$(jq --null-input --arg pass "$password" '{"password": $pass}') \
+    || json=$(jq --null-input '{}')
 
-  curl  -L -g -X POST "$GOSECRET/api${id}" \
+  curl -s -L -g -X POST "$GOSECRET/api${id}" \
     --header 'Content-Type: application/json' \
-    --data-raw "${json}"
+    --data-raw "${json}" \
+    | jq ' .message '
   unset id
   unset password
   unset json
