@@ -17,14 +17,9 @@ create_secret() {
     --arg life "$lifespan" \
     '
     {
-      "data": {
-        "type": "payloads",
-        "attributes": {
-          "message": $msg,
-          "password": $pass,
-          "lifespan": $life
-        }
-      }
+      "message": $msg,
+      "password": $pass,
+      "lifespan": $life
     }' \
   )
   curl -s -L -X POST "$GOSECRET/api/create" \
