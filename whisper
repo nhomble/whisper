@@ -24,8 +24,8 @@ create_secret() {
   curl -s -L -X POST "$WHISPER_GOSECRET/api/create" \
     --header 'Content-Type: application/json' \
     --data-raw "${json}" \
-    | jq '.message' \
-    | sed 's/^"\/secrets\//"/g'
+    | jq -r '.message' \
+    | sed 's/^\/secrets\///g'
 
   # fetep please teach
   unset message
@@ -46,7 +46,7 @@ view_secret() {
   curl -s -L -g -X POST "$WHISPER_GOSECRET/api/secrets/${id}" \
     --header 'Content-Type: application/json' \
     --data-raw "${json}" \
-    | jq ' .message '
+    | jq -r ' .message '
   unset id
   unset password
   unset json
